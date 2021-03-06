@@ -1,5 +1,6 @@
 # Backtrader Binance Bot
 A example of bot using Backtrader to trade Bitcoins in [Binance Exchange](https://www.binance.com/?ref=35723227).
+
 This project is not maintained, it is just an example of backtrader usage. **Do not use it in production**!
 
 Presentation in [TDC Belo Horizonte 2019](http://www.thedevelopersconference.com.br/tdc/2019/belohorizonte/trilha-python) (pt-BR)
