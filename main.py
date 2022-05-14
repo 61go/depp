@@ -48,15 +48,16 @@ def main():
         broker = store.getbroker(broker_mapping=broker_mapping)
         cerebro.setbroker(broker)
 
-        hist_start_date = dt.datetime.utcnow() - dt.timedelta(minutes=100)
+        hist_start_date = dt.datetime.utcnow() - dt.timedelta(minutes=30000)
         data = store.getdata(
             dataname='%s/%s' % (COIN_TARGET, COIN_REFER),
             name='%s%s' % (COIN_TARGET, COIN_REFER),
             timeframe=bt.TimeFrame.Minutes,
             fromdate=hist_start_date,
             compression=30,
-            ohlcv_limit=50
+            ohlcv_limit=99999
         )
+
         print(data)
         # Add the feed
         cerebro.adddata(data)
