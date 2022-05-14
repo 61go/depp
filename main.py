@@ -105,6 +105,9 @@ def main():
 if __name__ == "__main__":
     try:
         main()
+        print("finished.")
+        time = dt.datetime.now().strftime("%d-%m-%y %H:%M")
+        send_telegram_message("Bot finished by user at %s" % time)
     except KeyboardInterrupt:
         print("finished.")
         time = dt.datetime.now().strftime("%d-%m-%y %H:%M")

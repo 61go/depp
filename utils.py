@@ -43,8 +43,8 @@ def print_sqn(analyzer):
 
 
 def send_telegram_message(message=""):
-    if ENV != "production":
-        return
+    # if ENV != "production":
+    #     return
 
     base_url = "https://api.telegram.org/bot%s" % TELEGRAM.get("bot")
     return requests.get("%s/sendMessage" % base_url, params={

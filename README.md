@@ -41,3 +41,9 @@ Trade Analysis Results:
                1              5              2              19192.61       
 SQN: 1.75
 ```
+
+### 
+```shell
+pip uninstall matplotlib  # or conda
+pip install matplotlib==3.2.2
+```
