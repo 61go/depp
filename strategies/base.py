@@ -34,7 +34,7 @@ class StrategyBase(bt.Strategy):
             return
 
         if ENV == DEVELOPMENT:
-            self.log("做空: $%.2f" % self.data0.close[0])
+            self.log("触发做空-点位: $%.2f" % self.data0.close[0])
             return self.sell()
 
         cash, value = self.broker.get_wallet_balance(COIN_TARGET)
@@ -47,7 +47,7 @@ class StrategyBase(bt.Strategy):
         if self.last_operation == "BUY":
             return
 
-        self.log("做多: $%.2f" % self.data0.close[0], True)
+        self.log("触发做多-点位: $%.2f" % self.data0.close[0], True)
         self.buy_price_close = self.data0.close[0]
         price = self.data0.close[0]
 
@@ -79,7 +79,7 @@ class StrategyBase(bt.Strategy):
             if order.isbuy():
                 self.last_operation = "BUY"
                 self.log(
-                    '平多:\n价格: %.2f   成本: %.2f    手续费: %.2f' %
+                    '做多成交:\n价格: %.2f   成本: %.2f   手续费: %.2f' %
                     (order.executed.price,
                      order.executed.value,
                      order.executed.comm), True)
@@ -89,7 +89,7 @@ class StrategyBase(bt.Strategy):
             else:  # Sell
                 self.last_operation = "SELL"
                 self.reset_sell_indicators()
-                self.log('平空:\n价格: %.2f  成本 : %.2f   手续费: %.2f' %
+                self.log('做空成交:\n价格: %.2f  成本 : %.2f  手续费: %.2f' %
                          (order.executed.price,
                           order.executed.value,
                           order.executed.comm), True)
@@ -108,7 +108,7 @@ class StrategyBase(bt.Strategy):
         color = 'green'
         if trade.pnl < 0:
             color = 'red'
-        self.log('结算：\n毛利润 %.2f    净利润 %.2f' % (trade.pnl, trade.pnlcomm),  True, color)
+        self.log('结算：\n毛利润 %.2f   净利润 %.2f' % (trade.pnl, trade.pnlcomm),  True, color)
 
     def log(self, txt, send_telegram=False, color=None):
         plain_txt = txt
