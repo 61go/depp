@@ -34,12 +34,12 @@ class StrategyBase(bt.Strategy):
             return
 
         if ENV == DEVELOPMENT:
-            self.log("下卖单: $%.2f" % self.data0.close[0])
+            self.log("做空: $%.2f" % self.data0.close[0])
             return self.sell()
 
         cash, value = self.broker.get_wallet_balance(COIN_TARGET)
         amount = value*0.99
-        self.log("下卖单: $%.2f. 数量 %.6f %s - $%.2f USDT" % (self.data0.close[0],
+        self.log("做空: $%.2f. 数量 %.6f %s - $%.2f USDT" % (self.data0.close[0],
                                                                        amount, COIN_TARGET, value), True)
         return self.sell(size=amount)
 
@@ -47,7 +47,7 @@ class StrategyBase(bt.Strategy):
         if self.last_operation == "BUY":
             return
 
-        self.log("下买单: $%.2f" % self.data0.close[0], True)
+        self.log("做多: $%.2f" % self.data0.close[0], True)
         self.buy_price_close = self.data0.close[0]
         price = self.data0.close[0]
 
@@ -56,7 +56,7 @@ class StrategyBase(bt.Strategy):
 
         cash, value = self.broker.get_wallet_balance(COIN_REFER)
         amount = (value / price) * 0.99  # Workaround to avoid precision issues
-        self.log("下买单: $%.2f. 数量 %.6f %s. 余额 $%.2f USDT" % (self.data0.close[0],
+        self.log("做多: $%.2f. 数量 %.6f %s. 余额 $%.2f USDT" % (self.data0.close[0],
                                                                               amount, COIN_TARGET, value), True)
         return self.buy(size=amount)
 
@@ -73,13 +73,13 @@ class StrategyBase(bt.Strategy):
             return
 
         if order.status in [order.Expired]:
-            self.log('买入-订单过期', True)
+            self.log('订单超时', True)
 
         elif order.status in [order.Completed]:
             if order.isbuy():
                 self.last_operation = "BUY"
                 self.log(
-                    '执行买入:\n 价格: %.2f   成本: %.2f    手续费: %.2f' %
+                    '平多:\n价格: %.2f   成本: %.2f    手续费: %.2f' %
                     (order.executed.price,
                      order.executed.value,
                      order.executed.comm), True)
@@ -89,7 +89,7 @@ class StrategyBase(bt.Strategy):
             else:  # Sell
                 self.last_operation = "SELL"
                 self.reset_sell_indicators()
-                self.log('执行卖出:\n 价格: %.2f  成本 : %.2f   手续费: %.2f' %
+                self.log('平空:\n价格: %.2f  成本 : %.2f   手续费: %.2f' %
                          (order.executed.price,
                           order.executed.value,
                           order.executed.comm), True)
@@ -108,8 +108,7 @@ class StrategyBase(bt.Strategy):
         color = 'green'
         if trade.pnl < 0:
             color = 'red'
-
-        self.log('本次操作收益结算：\n 毛利润 %.2f    净利润 %.2f' % (trade.pnl, trade.pnlcomm),  True, color)
+        self.log('结算：\n毛利润 %.2f    净利润 %.2f' % (trade.pnl, trade.pnlcomm),  True, color)
 
     def log(self, txt, send_telegram=False, color=None):
         plain_txt = txt
