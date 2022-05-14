@@ -47,3 +47,8 @@ SQN: 1.75
 pip uninstall matplotlib  # or conda
 pip install matplotlib==3.2.2
 ```
+
+## 单独安装bt-ccxt-store
+```shell
+pip install git+https://github.com/Dave-Vallance/bt-ccxt-store.git
+```
