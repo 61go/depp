@@ -16,7 +16,7 @@ class StrategyBase(bt.Strategy):
         self.buy_price_close = None
         self.soft_sell = False
         self.hard_sell = False
-        self.log("Base strategy initialized")
+        self.log("基本策略初始化完成")
 
     def reset_sell_indicators(self):
         self.soft_sell = False
@@ -27,19 +27,19 @@ class StrategyBase(bt.Strategy):
         self.status = data._getstatusname(status)
         print(self.status)
         if status == data.LIVE:
-            self.log("LIVE DATA - Ready to trade")
+            self.log("生产数据 - 交易已就绪")
 
     def short(self):
         if self.last_operation == "SELL":
             return
 
         if ENV == DEVELOPMENT:
-            self.log("Sell ordered: $%.2f" % self.data0.close[0])
+            self.log("下卖单: $%.2f" % self.data0.close[0])
             return self.sell()
 
         cash, value = self.broker.get_wallet_balance(COIN_TARGET)
         amount = value*0.99
-        self.log("Sell ordered: $%.2f. Amount %.6f %s - $%.2f USDT" % (self.data0.close[0],
+        self.log("下卖单: $%.2f. 数量 %.6f %s - $%.2f USDT" % (self.data0.close[0],
                                                                        amount, COIN_TARGET, value), True)
         return self.sell(size=amount)
 
@@ -47,7 +47,7 @@ class StrategyBase(bt.Strategy):
         if self.last_operation == "BUY":
             return
 
-        self.log("Buy ordered: $%.2f" % self.data0.close[0], True)
+        self.log("下买单: $%.2f" % self.data0.close[0], True)
         self.buy_price_close = self.data0.close[0]
         price = self.data0.close[0]
 
@@ -56,25 +56,30 @@ class StrategyBase(bt.Strategy):
 
         cash, value = self.broker.get_wallet_balance(COIN_REFER)
         amount = (value / price) * 0.99  # Workaround to avoid precision issues
-        self.log("Buy ordered: $%.2f. Amount %.6f %s. Ballance $%.2f USDT" % (self.data0.close[0],
+        self.log("下买单: $%.2f. 数量 %.6f %s. 余额 $%.2f USDT" % (self.data0.close[0],
                                                                               amount, COIN_TARGET, value), True)
         return self.buy(size=amount)
 
     def notify_order(self, order):
-        if order.status in [order.Submitted, order.Accepted]:
+        if order.status in [order.Submitted]:
             # Buy/Sell order submitted/accepted to/by broker - Nothing to do
-            self.log('ORDER ACCEPTED/SUBMITTED')
+            self.log('订单提交成功！')
+            self.order = order
+            return
+        if order.status in [order.Accepted]:
+            # Buy/Sell order submitted/accepted to/by broker - Nothing to do
+            self.log('订单执行成功！')
             self.order = order
             return
 
         if order.status in [order.Expired]:
-            self.log('BUY EXPIRED', True)
+            self.log('买入-订单过期', True)
 
         elif order.status in [order.Completed]:
             if order.isbuy():
                 self.last_operation = "BUY"
                 self.log(
-                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                    '执行买入:\n 价格: %.2f   成本: %.2f    手续费: %.2f' %
                     (order.executed.price,
                      order.executed.value,
                      order.executed.comm), True)
@@ -84,14 +89,14 @@ class StrategyBase(bt.Strategy):
             else:  # Sell
                 self.last_operation = "SELL"
                 self.reset_sell_indicators()
-                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                self.log('执行卖出:\n 价格: %.2f  成本 : %.2f   手续费: %.2f' %
                          (order.executed.price,
                           order.executed.value,
                           order.executed.comm), True)
 
             # Sentinel to None: new orders allowed
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
-            self.log('Order Canceled/Margin/Rejected: Status %s - %s' % (order.Status[order.status],
+            self.log('订单被取消或被拒绝执行: 订单状态 %s - %s' % (order.Status[order.status],
                                                                          self.last_operation), True)
 
         self.order = None
@@ -104,9 +109,10 @@ class StrategyBase(bt.Strategy):
         if trade.pnl < 0:
             color = 'red'
 
-        self.log(colored('OPERATION PROFIT, GROSS %.2f, NET %.2f' % (trade.pnl, trade.pnlcomm), color), True)
+        self.log('本次操作收益结算：\n 毛利润 %.2f    净利润 %.2f' % (trade.pnl, trade.pnlcomm),  True, color)
 
     def log(self, txt, send_telegram=False, color=None):
+        plain_txt = txt
         if not DEBUG:
             return
 
@@ -119,4 +125,4 @@ class StrategyBase(bt.Strategy):
 
         print('[%s] %s' % (value.strftime("%d-%m-%y %H:%M"), txt))
         if send_telegram:
-            send_telegram_message(txt)
+            send_telegram_message(plain_txt)

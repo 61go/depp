@@ -14,7 +14,7 @@ class BasicRSI(StrategyBase):
 
     def __init__(self):
         StrategyBase.__init__(self)
-        self.log("Using RSI/EMA strategy")
+        self.log("使用策略: RSI/EMA")
 
         self.ema_fast = bt.indicators.EMA(period=self.p.period_ema_fast)
         self.ema_slow = bt.indicators.EMA(period=self.p.period_ema_slow)
@@ -38,7 +38,7 @@ class BasicRSI(StrategyBase):
 
         # stop Loss
         if self.profit < -0.03:
-            self.log("STOP LOSS: percentage %.3f %%" % self.profit)
+            self.log("止损触发: 百分比 %.3f %%" % self.profit)
             self.short()
 
         if self.last_operation != "BUY":
