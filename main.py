@@ -58,8 +58,7 @@ def main():
             ohlcv_limit=99999
         )
 
-        print(data)
-
+        print("数据获取成功")
         # Add the feed
         cerebro.adddata(data)
 
@@ -85,8 +84,8 @@ def main():
     cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="ta")
     cerebro.addanalyzer(bt.analyzers.SQN, _name="sqn")
 
-    # Include Strategy
-    cerebro.addstrategy(BasicRSI)
+    # Include Strategy 策略中定义的params可以在此自定义会发生覆盖
+    cerebro.addstrategy(BasicRSI, author='depp2')
 
     # Starting backtrader bot
     initial_value = cerebro.broker.getvalue()
@@ -99,9 +98,10 @@ def main():
     print('收益 %.3f%%' % ((final_value - initial_value) / initial_value * 100))
     print_trade_analysis(result[0].analyzers.ta.get_analysis())
     print_sqn(result[0].analyzers.sqn.get_analysis())
+    cerebro.plot()
 
-    if DEBUG:
-        cerebro.plot()
+    # if DEBUG:
+    #     cerebro.plot()
 
 
 if __name__ == "__main__":

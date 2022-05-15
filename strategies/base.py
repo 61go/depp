@@ -24,6 +24,7 @@ class StrategyBase(bt.Strategy):
         self.buy_price_close = None
 
     def notify_data(self, data, status, *args, **kwargs):
+        print("新生数据%s" % data)
         self.status = data._getstatusname(status)
         print(self.status)
         if status == data.LIVE:
@@ -39,6 +40,10 @@ class StrategyBase(bt.Strategy):
 
         cash, value = self.broker.get_wallet_balance(COIN_TARGET)
         amount = value*0.99
+        if self.position:
+            if self.position.size > 0:
+                self.log("平多: $%.2f. 数量 %.6f %s - $%.2f USDT" % (self.data0.close[0],
+                                                                 amount, COIN_TARGET, value), True)
         self.log("做空: $%.2f. 数量 %.6f %s - $%.2f USDT" % (self.data0.close[0],
                                                                        amount, COIN_TARGET, value), True)
         return self.sell(size=amount)
@@ -56,6 +61,11 @@ class StrategyBase(bt.Strategy):
 
         cash, value = self.broker.get_wallet_balance(COIN_REFER)
         amount = (value / price) * 0.99  # Workaround to avoid precision issues
+        if self.position:
+            if self.position.size < 0:
+                self.log("平空: $%.2f. 数量 %.6f %s - $%.2f USDT" % (self.data0.close[0],
+                                                                 amount, COIN_TARGET, value), True)
+
         self.log("做多: $%.2f. 数量 %.6f %s. 余额 $%.2f USDT" % (self.data0.close[0],
                                                                               amount, COIN_TARGET, value), True)
         return self.buy(size=amount)
