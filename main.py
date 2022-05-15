@@ -24,7 +24,7 @@ def main():
             'enableRateLimit': True,
         }
 
-        store = CCXTStore(exchange='binance', currency=COIN_REFER, config=broker_config, retries=5, debug=DEBUG)
+        store = CCXTStore(exchange='binance', currency=COIN_REFER, config=broker_config, retries=5, debug=False)
 
         broker_mapping = {
             'order_types': {
@@ -59,6 +59,7 @@ def main():
         )
 
         print(data)
+
         # Add the feed
         cerebro.adddata(data)
 

@@ -28,6 +28,7 @@ class BasicRSI(StrategyBase):
             self.profit = float(self.data0.close[0] - self.buy_price_close) / self.buy_price_close
 
     def next(self):
+        print('指标计算中...')
         self.update_indicators()
 
         if self.status != "LIVE" and ENV == PRODUCTION:  # waiting for live status in production
